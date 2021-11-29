@@ -36,9 +36,9 @@ def runserver(port):
     '''Run Flask server on development mode and selected TCP port.'''
     cmd = ''
     if os.name == 'posix':
-        cmd = f'. .venv/bin/activate; export FLASK_APP=biblioteca-back.app; export FLASK_ENV=development; flask run --port={port}'
+        cmd = f'. .venv/bin/activate; export FLASK_APP=bibliotecaback.app; export FLASK_ENV=development; flask run --port={port}'
     elif os.name == 'nt':
-        cmd = f'call .venv/Scripts/activate; set FLASK_APP=biblioteca-back.app; set FLASK_ENV=development; flask run --port={port}'
+        cmd = f'call .venv/Scripts/activate; set FLASK_APP=bibliotecaback.app; set FLASK_ENV=development; flask run --port={port}'
     subprocess.run(cmd, shell=True)
 
 
@@ -47,17 +47,17 @@ def runserver(port):
 @click.option('-t', '--templates', help="sets if the blueprint will use a private templates' directory.", is_flag=True, default=False)
 def plug_blueprint(name: str, templates: bool):
     '''Creates blueprint under blueprints directory and adds it to instance's settings.toml.'''
-    os.mkdir(os.path.join(os.getcwd(), 'biblioteca-back', 'blueprints', name))
+    os.mkdir(os.path.join(os.getcwd(), 'bibliotecaback', 'blueprints', name))
     if templates:
         tf = os.path.join(
-            os.getcwd(), 'biblioteca-back', 'blueprints', name, 'templates', name)
+            os.getcwd(), 'bibliotecaback', 'blueprints', name, 'templates', name)
         os.makedirs(tf)
         click.echo(f"Placed this blueprint's templates under {tf}")
 
     init = open(os.path.join(
-        os.getcwd(), 'biblioteca-back', 'blueprints', name, '__init__.py'), 'w')
+        os.getcwd(), 'bibliotecaback', 'blueprints', name, '__init__.py'), 'w')
     init.close()
-    with open(os.path.join(os.getcwd(), 'biblioteca-back', 'blueprints', name, f'{name}.py'), 'w') as blueprint:
+    with open(os.path.join(os.getcwd(), 'bibliotecaback', 'blueprints', name, f'{name}.py'), 'w') as blueprint:
         bluet = get_template('blueprint.pyt')
         blueprint.write(bluet.render(
             name=name, templates=templates))
@@ -65,7 +65,7 @@ def plug_blueprint(name: str, templates: bool):
     settings = toml.load(os.path.join(
         os.getcwd(), 'instance', 'settings.toml'))
     settings['default']['EXTENSIONS'].append(
-        f'biblioteca-back.blueprints.{name}.{name}:init_app')
+        f'bibliotecaback.blueprints.{name}.{name}:init_app')
     with open(os.path.join(os.getcwd(), 'instance', 'settings.toml'), 'w') as f:
         f.write(toml.dumps(settings))
 
@@ -79,7 +79,7 @@ def plug_database():
     # setup tasks
     settings = toml.load(os.path.join(
         os.getcwd(), 'instance', 'settings.toml'))
-    if 'biblioteca-back.ext.database:init_app' in settings['default']['EXTENSIONS']:
+    if 'bibliotecaback.ext.database:init_app' in settings['default']['EXTENSIONS']:
         click.echo('Database seems to be already plugged.')
         exit(0)
 
@@ -94,18 +94,18 @@ def plug_database():
         cmd = f'call {os.path.join(os.getcwd(), ".venv", "Scripts", "activate")}; pip install -r {os.path.join(os.getcwd(), "requirements.txt")};'
     subprocess.call(cmd, shell=True)
     # project.ext.database
-    with open(os.path.join(os.getcwd(), 'biblioteca-back', 'ext', 'database.py'), 'w') as db_module:
+    with open(os.path.join(os.getcwd(), 'bibliotecaback', 'ext', 'database.py'), 'w') as db_module:
         db_template = get_template('database.pyt')
-        db_module.write(db_template.render(name='biblioteca-back'))
+        db_module.write(db_template.render(name='bibliotecaback'))
     # models.py (basic example)
-    with open(os.path.join(os.getcwd(), 'biblioteca-back', 'models.py'), 'w') as models_file:
+    with open(os.path.join(os.getcwd(), 'bibliotecaback', 'models.py'), 'w') as models_file:
         mod_template = get_template('models.pyt')
-        models_file.write(mod_template.render(project='biblioteca-back'))
+        models_file.write(mod_template.render(project='bibliotecaback'))
     # settings.toml
     settings = toml.load(os.path.join(
         os.getcwd(), 'instance', 'settings.toml'))
     settings['default']['EXTENSIONS'].append(
-        'biblioteca-back.ext.database:init_app')
+        'bibliotecaback.ext.database:init_app')
     settings['default']['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+os.path.join(
         os.getcwd(), 'instance', 'db.sqlite3')
     with open(os.path.join(os.getcwd(), 'instance', 'settings.toml'), 'w') as f:
@@ -114,9 +114,9 @@ def plug_database():
     click.echo('Creating migrations directory')
     cmd = ''
     if os.name == 'posix':
-        cmd = f'. .venv/bin/activate; export FLASK_APP=biblioteca-back.app; export FLASK_ENV=development; flask db init'
+        cmd = f'. .venv/bin/activate; export FLASK_APP=bibliotecaback.app; export FLASK_ENV=development; flask db init'
     elif os.name == 'nt':
-        cmd = f'call .venv/Scripts/activate; set FLASK_APP=biblioteca-back.app; set FLASK_ENV=development; flask db init'
+        cmd = f'call .venv/Scripts/activate; set FLASK_APP=bibliotecaback.app; set FLASK_ENV=development; flask db init'
     subprocess.run(cmd, shell=True)
     
     click.echo("Everything is setted up. Please, before doing migrations, remember your models isn't connected to any entrypoint of your app.")
@@ -127,11 +127,11 @@ def plug_database():
 def db_migrate(message):
     settings = toml.load(os.path.join(
         os.getcwd(), 'instance', 'settings.toml'))
-    if 'biblioteca-back.ext.database:init_app' not in settings['default']['EXTENSIONS']:
+    if 'bibliotecaback.ext.database:init_app' not in settings['default']['EXTENSIONS']:
         click.echo('No database plugged.')
         exit(0)
     from flask_migrate import migrate
-    from biblioteca-back.app import create_app
+    from bibliotecaback.app import create_app
     app = create_app()
     with app.app_context():
         migrate(message=message)
@@ -141,11 +141,11 @@ def db_migrate(message):
 def db_upgrade():
     settings = toml.load(os.path.join(
         os.getcwd(), 'instance', 'settings.toml'))
-    if 'biblioteca-back.ext.database:init_app' not in settings['default']['EXTENSIONS']:
+    if 'bibliotecaback.ext.database:init_app' not in settings['default']['EXTENSIONS']:
         click.echo('No database plugged.')
         exit(0)
     from flask_migrate import upgrade
-    from biblioteca-back.app import create_app
+    from bibliotecaback.app import create_app
     app = create_app()
     with app.app_context():
         upgrade()
@@ -155,11 +155,11 @@ def db_upgrade():
 def db_downgrade():
     settings = toml.load(os.path.join(
         os.getcwd(), 'instance', 'settings.toml'))
-    if 'biblioteca-back.ext.database:init_app' not in settings['default']['EXTENSIONS']:
+    if 'bibliotecaback.ext.database:init_app' not in settings['default']['EXTENSIONS']:
         click.echo('No database plugged.')
         exit(0)
     from flask_migrate import downgrade
-    from biblioteca-back.app import create_app
+    from bibliotecaback.app import create_app
     app = create_app()
     with app.app_context():
         downgrade()

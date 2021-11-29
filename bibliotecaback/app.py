@@ -1,5 +1,5 @@
 from flask import Flask
-from biblioteca-back.ext import configuration
+from bibliotecaback.ext import configuration
 from .views import root
 
 
